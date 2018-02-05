@@ -61,27 +61,17 @@ type Application struct {
 	ApplicationId string `json:"applicationId"`
 }
 
-type Attribute struct {
-	Key string `json:"key"`
-}
-
 type Session struct {
-	New         bool        `json:"new"`
-	SessionId   string      `json:"sessionId"`
-	Application Application `json:"application"`
-	Attributes  Attribute   `json:"attributes"`
-	User        User        `json:"user"`
-}
-
-type SupportedInterface struct {
-	Display     interface{}
-	AudioPlayer interface{}
-	VideoApp    interface{}
+	New         bool                         `json:"new"`
+	SessionId   string                       `json:"sessionId"`
+	Application Application                  `json:"application"`
+	Attributes  map[string]map[string]string `json:"attributes"`
+	User        User                         `json:"user"`
 }
 
 type SupportedDevice struct {
-	DeviceId            string             `json:"deviceId"`
-	SupportedInterfaces SupportedInterface `json:"supportedInterfaces"`
+	DeviceId            string                       `json:"deviceId"`
+	SupportedInterfaces map[string]map[string]string `json:"supportedInterfaces"`
 }
 
 type AudioPlayer struct {
@@ -91,7 +81,7 @@ type AudioPlayer struct {
 }
 
 type System struct {
-	Device         SupportedDevice `json:"deviceId"`
+	Device         SupportedDevice `json:"device"`
 	Application    Application     `json:"application`
 	ApiEndpoint    string          `json:"apiEndpoint"`
 	ApiAccessToken string          `json:"apiAccessToken"`
