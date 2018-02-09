@@ -48,13 +48,13 @@ type Launch struct {
 }
 
 type Permission struct {
-	ConsentToken string `json:"consentToken"`
+	ConsentToken string `json:"consentToken"` 
 }
 
 type User struct {
 	UserId      string     `json:"userId"`
 	AccessToken string     `json:"accessToken"`
-	Permissions Permission `json:"permissions"`
+	Permissions Permission `json:"permissions"` //deprecated 
 }
 
 type Application struct {
