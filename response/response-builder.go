@@ -9,12 +9,16 @@ type ResponseBuilder interface {
 	AskWithCard(string, string, Card) ResponseBuilder
 	Say(string) ResponseBuilder
 	SayWithCard(string, Card) ResponseBuilder
-	Card() ResponseBuilder
-	PlayVideo(string, MetaData) ResponseBuilder
+	CreateCard(string,string,string,string) ResponseBuilder
+	PlayVideo(string, string, string) ResponseBuilder
 	Hint(string) ResponseBuilder
 	LinkAccountCard() ResponseBuilder
 	AskForPermissionsConsentCard() ResponseBuilder
-	Build(string, map[string]string) ResponseBody
+	Build(map[string]string) ResponseBody
+  AudioPlayerPlay(string, string, string, string, int64) ResponseBuilder
+  AudioPlayerStop() ResponseBuilder
+  AudioPlayerClear(string) ResponseBuilder
+ // containsVideoDirective()/
 }
 
 type responseBuilder struct {
@@ -22,9 +26,10 @@ type responseBuilder struct {
 	SessionAttributes map[string]string
 	OutputSpeech      OutputSpeech
 	Card              Card
-	Reprompt          Reprompt
+	Reprompt          OutputSpeech
 	Directives        []map[string]interface{}
 	shouldEndSession  bool
+
 }
 
 func buildSpeech(message string) OutputSpeech {
@@ -48,7 +53,7 @@ func (rb *responseBuilder) Ask(message string, reprompt string) ResponseBuilder 
 
 	rb.OutputSpeech = buildSpeech(message)
 	rb.Reprompt = buildSpeech(reprompt)
-	rb.ShouldEndSession = false
+	rb.shouldEndSession = false
 	return rb
 
 }
@@ -57,28 +62,26 @@ func (rb *responseBuilder) AskWithCard(message string, reprompt string, card Car
 
 	rb.OutputSpeech = buildSpeech(message)
 	rb.Reprompt = buildSpeech(reprompt)
-	rb.ShouldEndSession = false
+	rb.shouldEndSession = false
 	rb.Card = card
 	return rb
 }
 
-func (rb *responseBuilder) Say(message string, attributes map[string]string) responseBuilder {
+func (rb *responseBuilder) Say(message string) ResponseBuilder {
 	rb.OutputSpeech = buildSpeech(message)
-	rb.Reprompt = buildSpeech(reprompt)
-	rb.ShouldEndSession = true
+	rb.shouldEndSession = true
 	return rb
 }
 
-func (rb *responseBuilder) SayWithCard(message string, attributes map[string]string, card Card) responseBuilder {
+func (rb *responseBuilder) SayWithCard(message string, card Card) ResponseBuilder {
 
 	rb.OutputSpeech = buildSpeech(message)
-	rb.Reprompt = buildSpeech(reprompt)
-	rb.ShouldEndSession = true
+	rb.shouldEndSession = true
 	rb.Card = card
 	return rb
 }
 
-func (rb *responseBuilder) Card(cardTitle string, cardContent string, largeUrl string, smallUrl string) {
+func (rb *responseBuilder) CreateCard(cardTitle string, cardContent string, largeUrl string, smallUrl string) ResponseBuilder {
 
 	if largeUrl != "" || smallUrl != "" {
 		images := Image{}
@@ -86,7 +89,7 @@ func (rb *responseBuilder) Card(cardTitle string, cardContent string, largeUrl s
 			images.LargeImageUrl = largeUrl
 		}
 		if smallUrl != "" {
-			images.SmallImageUrl = smallImageUrl
+			images.SmallImageUrl = smallUrl
 		}
 		rb.Card = Card{
 			Type:   "Standard",
@@ -131,17 +134,16 @@ func (rb *responseBuilder) AudioPlayerPlay(behavior string, url string, token st
 	return rb
 }
 
-func (rb *responseBuilder) AudioPlayerStop() {
+func (rb *responseBuilder) AudioPlayerStop() ResponseBuilder{
 	audioDirective := map[string]interface{}{
 		"type":         "AudioPlayer.Stop",
-		"playBehavior": behavior,
 	}
 	rb.Directives = append(rb.Directives, audioDirective)
 	return rb
 }
 
 //behavior = CLEAR_ALL, CLEAR_ENQUEUE
-func (rb *responseBuilder) AudioPlayerClear() {
+func (rb *responseBuilder) AudioPlayerClear(behavior string) ResponseBuilder {
 	audioDirective := map[string]interface{}{
 		"type":          "AudioPlayer.ClearQueue",
 		"clearBehavior": behavior,
@@ -171,7 +173,7 @@ func (rb *responseBuilder) PlayVideo(url string, title string, subtitle string) 
 		"type":      "VideoApp.Launch",
 		"videoItem": videoItem,
 	}
-	rb.containsVideoDirective = true
+	//rb.containsVideoDirective = true
 	rb.Directives = append(rb.Directives, videoDirective)
 	return rb
 }
@@ -183,6 +185,8 @@ func (rb *responseBuilder) RenderTemplate(template map[string]interface{}) Respo
 		"type":     "Display.RenderTemplate",
 		"template": template,
 	}
+  rb.Directives = append(rb.Directives, templateDirective)
+  return rb
 }
 
 func (rb *responseBuilder) Hint(hintText string) ResponseBuilder {
@@ -212,22 +216,22 @@ func (rb *responseBuilder) AskForPermissionsConsentCard() ResponseBuilder {
 	askPermissionDirective := map[string]interface{}{
 		"type": "AskForPermissionsConsent",
 	}
-	rb.Directives = append(rb.Directives, linkAccountDirective)
+	rb.Directives = append(rb.Directives, askPermissionDirective)
 	return rb
 }
 
-func (rb *responseBuilder) Build() ResponseBody {
+func (rb *responseBuilder) Build(attributes map[string]string) ResponseBody {
 	responseContent := ResponseContent{}
-	if !rb.containsVideoDirective {
-		responseContent.ShouldEndSession = rb.shouldEndSession
-	}
+	// if !rb.containsVideoDirective {
+	// 	responseContent.ShouldEndSession = rb.shouldEndSession
+	// }
 
 	responseContent.Card = rb.Card
 	responseContent.OutputSpeech = rb.OutputSpeech
 	responseContent.Reprompt = rb.Reprompt
 	responseContent.Directives = rb.Directives
 
-	response := ResponseBoby{
+	response := ResponseBody{
 		Version:           "1.0",
 		SessionAttributes: rb.SessionAttributes,
 		Response:          responseContent,

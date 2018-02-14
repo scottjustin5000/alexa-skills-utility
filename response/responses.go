@@ -30,8 +30,8 @@ type Directive struct {
 type ResponseContent struct {
 	OutputSpeech     OutputSpeech `json:"outputSpeech"`
 	Card             Card         `json:"card"`
-	Reprompt         Reprompt     `json:"reprompt"`
-	Directives       []Directive  `json:"directive"`
+	Reprompt         OutputSpeech     `json:"reprompt"`
+	Directives       []map[string]interface {}  `json:"directives"`
 	ShouldEndSession bool         `json:"shouldEndSession"`
 }
 
