@@ -18,7 +18,6 @@ type ResponseBuilder interface {
   AudioPlayerPlay(string, string, string, string, int64) ResponseBuilder
   AudioPlayerStop() ResponseBuilder
   AudioPlayerClear(string) ResponseBuilder
- // containsVideoDirective()/
 }
 
 type responseBuilder struct {
@@ -29,6 +28,7 @@ type responseBuilder struct {
 	Reprompt          OutputSpeech
 	Directives        []map[string]interface{}
 	shouldEndSession  bool
+  containsVideoDirective bool
 
 }
 
@@ -173,7 +173,7 @@ func (rb *responseBuilder) PlayVideo(url string, title string, subtitle string) 
 		"type":      "VideoApp.Launch",
 		"videoItem": videoItem,
 	}
-	//rb.containsVideoDirective = true
+	rb.containsVideoDirective = true
 	rb.Directives = append(rb.Directives, videoDirective)
 	return rb
 }
@@ -222,9 +222,9 @@ func (rb *responseBuilder) AskForPermissionsConsentCard() ResponseBuilder {
 
 func (rb *responseBuilder) Build(attributes map[string]string) ResponseBody {
 	responseContent := ResponseContent{}
-	// if !rb.containsVideoDirective {
-	// 	responseContent.ShouldEndSession = rb.shouldEndSession
-	// }
+	if !rb.containsVideoDirective {
+		responseContent.ShouldEndSession = rb.shouldEndSession
+	}
 
 	responseContent.Card = rb.Card
 	responseContent.OutputSpeech = rb.OutputSpeech
