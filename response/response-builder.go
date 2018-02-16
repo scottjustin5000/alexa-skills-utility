@@ -8,6 +8,7 @@ type ResponseBuilder interface {
 	Ask(string, string) ResponseBuilder
 	AskWithCard(string, string, Card) ResponseBuilder
 	Say(string) ResponseBuilder
+  Whisper(string) ResponseBuilder
 	SayWithCard(string, Card) ResponseBuilder
 	CreateCard(string,string,string,string) ResponseBuilder
 	PlayVideo(string, string, string) ResponseBuilder
@@ -73,6 +74,13 @@ func (rb *responseBuilder) Say(message string) ResponseBuilder {
 	return rb
 }
 
+func (rb *responseBuilder) Whisper(message string) ResponseBuilder {
+  text := "<amazon:effect type=\"whispered\">" + message + "</amazon:effect>"
+  rb.OutputSpeech = buildSpeech(text)
+  rb.shouldEndSession = true
+  return rb
+}
+
 func (rb *responseBuilder) SayWithCard(message string, card Card) ResponseBuilder {
 
 	rb.OutputSpeech = buildSpeech(message)
@@ -93,7 +101,8 @@ func (rb *responseBuilder) CreateCard(cardTitle string, cardContent string, larg
 		}
 		rb.Card = Card{
 			Type:   "Standard",
-			Text:   cardContent,
+      Title: cardTitle,
+			Content:   cardContent,
 			Images: images,
 		}
 	} else {
@@ -225,7 +234,6 @@ func (rb *responseBuilder) Build(attributes map[string]string) ResponseBody {
 	if !rb.containsVideoDirective {
 		responseContent.ShouldEndSession = rb.shouldEndSession
 	}
-
 	responseContent.Card = rb.Card
 	responseContent.OutputSpeech = rb.OutputSpeech
 	responseContent.Reprompt = rb.Reprompt
