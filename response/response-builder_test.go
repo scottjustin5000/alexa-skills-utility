@@ -111,24 +111,42 @@ func TestAskWithCard(t *testing.T) {
 func TestAudioPlayerPlay(t *testing.T) {
   rb := New()
   attributes := map[string]string{}
-  response := rb.AudioPlayerPlay("REPLACE_ALL", "https://somewhere/large_image.mp4", "token", "prevToken", 3000).Build(attributes)
+  response := rb.AudioPlayerPlay("REPLACE_ALL", "https://somewhere/large_image.mp3", "token", "prevToken", 3000).Build(attributes)
   audioItem := response.Response.Directives[0]["audioItem"].(map[string]interface {})
   audioStream := audioItem["audioStream"].(AudioStream)
   
   assert.Equal(t, response.Response.Directives[0]["type"],"AudioPlayer.Play")
   assert.Equal(t, response.Response.Directives[0]["playBehavior"], "REPLACE_ALL")
-  assert.Equal(t, audioStream.Url, "https://somewhere/large_image.mp4")
+  assert.Equal(t, audioStream.Url, "https://somewhere/large_image.mp3")
 }
 
 func TestAudioPlayerStop(t *testing.T) {
+  rb := New()
+  attributes := map[string]string{}
+  response := rb.AudioPlayerStop().Build(attributes)
+  assert.Equal(t, response.Response.Directives[0]["type"],"AudioPlayer.Stop")
 
 }
 
 func TestAudioPlayerClear(t *testing.T) {
-
+  rb := New()
+  attributes := map[string]string{}
+  response := rb.AudioPlayerClear("CLEAR_ALL").Build(attributes)
+  assert.Equal(t, response.Response.Directives[0]["type"],"AudioPlayer.ClearQueue")
+  assert.Equal(t, response.Response.Directives[0]["clearBehavior"],"CLEAR_ALL")
 }
 
 func TestPlayVideo(t *testing.T) {
+  rb := New()
+  attributes := map[string]string{}
+  response := rb.PlayVideo("http://fake/move.mov", "movie title", "movie subtitle").Build(attributes)
+  videoItem := response.Response.Directives[0]["videoItem"].(map[string]interface {})
+  meta := videoItem["metadata"].(map[string]interface{})
+  
+  assert.Equal(t, response.Response.Directives[0]["type"],"VideoApp.Launch")
+  assert.Equal(t, videoItem["source"], "http://fake/move.mov")
+  assert.Equal(t, meta["title"], "movie title")
+  assert.Equal(t, meta["subtitle"], "movie subtitle")
 
 }
 
@@ -137,9 +155,15 @@ func TestRenderTemplate(t *testing.T) {
 }
 
 func TestLinkAccountCard(t *testing.T) {
-
+  rb := New()
+  attributes := map[string]string{}
+  response := rb.LinkAccountCard().Build(attributes)
+  assert.Equal(t, response.Response.Directives[0]["type"],"LinkAccount")
 }
 
 func TestAskForPermissionsConsentCard(t *testing.T) {
-
+  rb := New()
+  attributes := map[string]string{}
+  response := rb.AskForPermissionsConsentCard().Build(attributes)
+  assert.Equal(t, response.Response.Directives[0]["type"],"AskForPermissionsConsent")
 }
