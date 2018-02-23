@@ -17,6 +17,6 @@ type SessionEndedRequest struct {
 		Error     struct {
 			Type    string `json:"type"`
 			Message string `json:"message"`
-		} `json:"Request"`
-	} `json:request`
+		} `json:"error"`
+	} `json:"request"`
 }

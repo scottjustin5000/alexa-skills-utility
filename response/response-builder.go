@@ -115,13 +115,6 @@ func (rb *responseBuilder) CreateCard(cardTitle string, cardContent string, larg
 	return rb
 }
 
-type AudioStream struct {
-	Url                   string `json:"url"`
-	Token                 string `json:"token"`
-	ExpectedPreviousToken string `json:"expectedPreviousToken"`
-	OffsetInMilliseconds  int64  `json:"offsetInMilliseconds"`
-}
-
 //behavior = REPLACE_ALL, ENQUEUE, REPLACE_ENQUEUED
 func (rb *responseBuilder) AudioPlayerPlay(behavior string, url string, token string, expectedPreviousToken string, offsetInMilliseconds int64) ResponseBuilder {
 	audioDirective := map[string]interface{}{

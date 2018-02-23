@@ -3,7 +3,7 @@ package request
 import (
 	"encoding/json"
 	"testing"
-
+	
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,9 +81,40 @@ func TestIntentRequest(t *testing.T) {
 }
 
 func TestPlayBackControllerRequest(t *testing.T) {
+	requestString := `{"version": "1.0", "context": {"System": {"application": {"applicationId": "amzn1.ask.skill.application_id"}, "user": {"userId": "amzn1.ask.account.1234", "accessToken":"AAAAAAAA", "permissions":{"consentToken": "ZZZZZZZ"}}, "device": {"deviceId": "string","supportedInterfaces": {"AudioPlayer": {}}} }, "AudioPlayer": {"token": "2015-05-13T12:34:56Z", "offsetInMilliseconds": 0, "playerActivity": "activity"} }, "request": {"type": "PlaybackController.NextCommandIssued", "requestId": "abc123", "timestamp": "2015-05-13T12:34:56Z", "locale": "en-US"} }`
+	res := &PlaybackControllerRequest{}
+	err := json.Unmarshal([]byte(requestString), res)
+
+	if err != nil {
+		t.Errorf("something went wrong", err)
+	}
+
+	assert.Equal(t, "PlaybackController.NextCommandIssued", res.Request.ReqType)
 
 }
 
 func TestAudioPlayerRequest(t *testing.T) {
+	requestString := `{"version": "1.0", "context": {"System": {"application": {"applicationId": "amzn1.ask.skill.application_id"}, "user": {"userId": "amzn1.ask.account.1234", "accessToken": "AAAAAAAA", "permissions": {"consentToken": "ZZZZZZZ"} }, "device": {"deviceId": "string", "supportedInterfaces": {"AudioPlayer": {} } } } }, "request": {"type": "AudioPlayer.PlaybackStarted", "requestId": "reqid", "timestamp": "2015-05-13T12:34:56Z", "token": "token", "offsetInMilliseconds": 0, "locale": "en-US"} }`
+	res := &AudioPlayerRequest{}
+	err := json.Unmarshal([]byte(requestString), res)
 
+	if err != nil {
+		t.Errorf("something went wrong", err)
+	}
+
+	assert.Equal(t, "AudioPlayer.PlaybackStarted", res.Request.ReqType)
+}
+
+func TestSessionEndedRequest(t *testing.T) {
+	requestString := `{"version": "1.0", "context": {"System": {"application": {"applicationId": "amzn1.ask.skill.application_id"}, "user": {"userId": "amzn1.ask.account.1234", "accessToken": "AAAAAAAA", "permissions": {"consentToken": "ZZZZZZZ"} }, "device": {"deviceId": "string", "supportedInterfaces": {"AudioPlayer": {} } } } }, "request": {"type": "SessionEndedRequest", "requestId": "reqId", "timestamp": "2015-05-13T12:34:56Z", "reason": "some reason", "locale": "en-US", "error": {"type": "INVALID_RESPONSE", "message": "some error"} } }`
+	res := &SessionEndedRequest{}
+	err := json.Unmarshal([]byte(requestString), res)
+
+	if err != nil {
+		t.Errorf("something went wrong", err)
+	}
+	assert.Equal(t, "SessionEndedRequest", res.Request.ReqType)
+	assert.Equal(t, "some reason", res.Request.Reason)
+	assert.Equal(t, "INVALID_RESPONSE", res.Request.Error.Type)
+	assert.Equal(t, "some error", res.Request.Error.Message)
 }

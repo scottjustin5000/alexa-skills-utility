@@ -52,3 +52,10 @@ type OutputSpeechResponse struct {
 	SessionAttributes map[string]string           `json:"sessionAttributes"`
 	Response          OutputSpeechResponseContent `json:"response"`
 }
+
+type AudioStream struct {
+	Url                   string `json:"url"`
+	Token                 string `json:"token"`
+	ExpectedPreviousToken string `json:"expectedPreviousToken"`
+	OffsetInMilliseconds  int64  `json:"offsetInMilliseconds"`
+}

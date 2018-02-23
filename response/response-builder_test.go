@@ -1,7 +1,6 @@
 package response
 import (
   "testing"
-  //"fmt"
   "reflect"
   "github.com/stretchr/testify/assert"
 )
@@ -49,9 +48,20 @@ func TestWhisper(t *testing.T) {
   assert.Equal(t, response.Response.OutputSpeech.Ssml, "<speak><amazon:effect type=\"whispered\">Can you keep a secret?</amazon:effect></speak>", "Ssml should include whisper effect")
 }
 
+func TestCreateCard(t *testing.T) {
+   rb := New()
+  attributes := map[string]string{}
+  response := rb.CreateCard("title", "some great content", "https://somewhere/large_image.png", "https://somewhere/small_image.png").Build(attributes)
+  assert.Equal(t, response.Response.Card.Type, "Standard", "Card type should be standard")
+  assert.Equal(t, response.Response.Card.Title, "title","Card title should match")
+  assert.Equal(t, response.Response.Card.Content, "some great content","Card Content should match")
+  assert.Equal(t, response.Response.Card.Images.SmallImageUrl, "https://somewhere/small_image.png", "small image should match")
+  assert.Equal(t, response.Response.Card.Images.LargeImageUrl, "https://somewhere/large_image.png", "large image should match")
+}
+
 func TestSayWithCard(t *testing.T) {
   rb := New()
-  c :=Card{
+  c := Card{
     Type: "Standard",
     Title: "s'up card",
     Content: "Card Content",
@@ -96,5 +106,40 @@ func TestAskWithCard(t *testing.T) {
   assert.Equal(t, response.Response.Card.Content, "of interest","Card Content should match")
   assert.Equal(t, response.Response.Card.Images.SmallImageUrl, "https://somewhere/small_image.png", "small image should match")
   assert.Equal(t, response.Response.Card.Images.LargeImageUrl, "https://somewhere/large_image.png", "large image should match")
+}
+
+func TestAudioPlayerPlay(t *testing.T) {
+  rb := New()
+  attributes := map[string]string{}
+  response := rb.AudioPlayerPlay("REPLACE_ALL", "https://somewhere/large_image.mp4", "token", "prevToken", 3000).Build(attributes)
+  audioItem := response.Response.Directives[0]["audioItem"].(map[string]interface {})
+  audioStream := audioItem["audioStream"].(AudioStream)
+  
+  assert.Equal(t, response.Response.Directives[0]["type"],"AudioPlayer.Play")
+  assert.Equal(t, response.Response.Directives[0]["playBehavior"], "REPLACE_ALL")
+  assert.Equal(t, audioStream.Url, "https://somewhere/large_image.mp4")
+}
+
+func TestAudioPlayerStop(t *testing.T) {
+
+}
+
+func TestAudioPlayerClear(t *testing.T) {
+
+}
+
+func TestPlayVideo(t *testing.T) {
+
+}
+
+func TestRenderTemplate(t *testing.T) {
+
+}
+
+func TestLinkAccountCard(t *testing.T) {
+
+}
+
+func TestAskForPermissionsConsentCard(t *testing.T) {
 
 }
