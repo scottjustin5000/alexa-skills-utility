@@ -8,29 +8,28 @@ type ResponseBuilder interface {
 	Ask(string, string) ResponseBuilder
 	AskWithCard(string, string, Card) ResponseBuilder
 	Say(string) ResponseBuilder
-  Whisper(string) ResponseBuilder
+	Whisper(string) ResponseBuilder
 	SayWithCard(string, Card) ResponseBuilder
-	CreateCard(string,string,string,string) ResponseBuilder
+	CreateCard(string, string, string, string) ResponseBuilder
 	PlayVideo(string, string, string) ResponseBuilder
 	Hint(string) ResponseBuilder
 	LinkAccountCard() ResponseBuilder
 	AskForPermissionsConsentCard() ResponseBuilder
 	Build(map[string]string) ResponseBody
-  AudioPlayerPlay(string, string, string, string, int64) ResponseBuilder
-  AudioPlayerStop() ResponseBuilder
-  AudioPlayerClear(string) ResponseBuilder
+	AudioPlayerPlay(string, string, string, string, int64) ResponseBuilder
+	AudioPlayerStop() ResponseBuilder
+	AudioPlayerClear(string) ResponseBuilder
 }
 
 type responseBuilder struct {
-	Version           string
-	SessionAttributes map[string]string
-	OutputSpeech      OutputSpeech
-	Card              Card
-	Reprompt          OutputSpeech
-	Directives        []map[string]interface{}
-	shouldEndSession  bool
-  containsVideoDirective bool
-
+	Version                string
+	SessionAttributes      map[string]string
+	OutputSpeech           OutputSpeech
+	Card                   Card
+	Reprompt               OutputSpeech
+	Directives             []map[string]interface{}
+	shouldEndSession       bool
+	containsVideoDirective bool
 }
 
 func buildSpeech(message string) OutputSpeech {
@@ -75,10 +74,10 @@ func (rb *responseBuilder) Say(message string) ResponseBuilder {
 }
 
 func (rb *responseBuilder) Whisper(message string) ResponseBuilder {
-  text := "<amazon:effect type=\"whispered\">" + message + "</amazon:effect>"
-  rb.OutputSpeech = buildSpeech(text)
-  rb.shouldEndSession = true
-  return rb
+	text := "<amazon:effect type=\"whispered\">" + message + "</amazon:effect>"
+	rb.OutputSpeech = buildSpeech(text)
+	rb.shouldEndSession = true
+	return rb
 }
 
 func (rb *responseBuilder) SayWithCard(message string, card Card) ResponseBuilder {
@@ -100,10 +99,10 @@ func (rb *responseBuilder) CreateCard(cardTitle string, cardContent string, larg
 			images.SmallImageUrl = smallUrl
 		}
 		rb.Card = Card{
-			Type:   "Standard",
-      Title: cardTitle,
-			Content:   cardContent,
-			Images: images,
+			Type:    "Standard",
+			Title:   cardTitle,
+			Content: cardContent,
+			Images:  images,
 		}
 	} else {
 		rb.Card = Card{
@@ -136,9 +135,9 @@ func (rb *responseBuilder) AudioPlayerPlay(behavior string, url string, token st
 	return rb
 }
 
-func (rb *responseBuilder) AudioPlayerStop() ResponseBuilder{
+func (rb *responseBuilder) AudioPlayerStop() ResponseBuilder {
 	audioDirective := map[string]interface{}{
-		"type":         "AudioPlayer.Stop",
+		"type": "AudioPlayer.Stop",
 	}
 	rb.Directives = append(rb.Directives, audioDirective)
 	return rb
@@ -187,8 +186,8 @@ func (rb *responseBuilder) RenderTemplate(template map[string]interface{}) Respo
 		"type":     "Display.RenderTemplate",
 		"template": template,
 	}
-  rb.Directives = append(rb.Directives, templateDirective)
-  return rb
+	rb.Directives = append(rb.Directives, templateDirective)
+	return rb
 }
 
 func (rb *responseBuilder) Hint(hintText string) ResponseBuilder {

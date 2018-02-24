@@ -28,11 +28,11 @@ type Directive struct {
 }
 
 type ResponseContent struct {
-	OutputSpeech     OutputSpeech `json:"outputSpeech"`
-	Card             Card         `json:"card"`
-	Reprompt         OutputSpeech     `json:"reprompt"`
-	Directives       []map[string]interface {}  `json:"directives"`
-	ShouldEndSession bool         `json:"shouldEndSession"`
+	OutputSpeech     OutputSpeech             `json:"outputSpeech"`
+	Card             Card                     `json:"card"`
+	Reprompt         OutputSpeech             `json:"reprompt"`
+	Directives       []map[string]interface{} `json:"directives"`
+	ShouldEndSession bool                     `json:"shouldEndSession"`
 }
 
 type ResponseBody struct {
