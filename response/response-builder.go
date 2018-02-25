@@ -12,6 +12,7 @@ type ResponseBuilder interface {
 	SayWithCard(string, Card) ResponseBuilder
 	CreateCard(string, string, string, string) ResponseBuilder
 	PlayVideo(string, string, string) ResponseBuilder
+	DialogDirective(bool) ResponseBuilder
 	Hint(string) ResponseBuilder
 	LinkAccountCard() ResponseBuilder
 	AskForPermissionsConsentCard() ResponseBuilder
@@ -153,9 +154,14 @@ func (rb *responseBuilder) AudioPlayerClear(behavior string) ResponseBuilder {
 	return rb
 }
 
-// func(rb* responseBuilder) DialogDirective() {
-//   https://developer.amazon.com/docs/custom-skills/dialog-interface-reference.html
-// }
+func(rb *responseBuilder) DialogDirective(endSession bool) ResponseBuilder {
+  dialogDirective := map[string]interface{}{
+		"type":          "Dialog.Delegate"
+	}
+	rb.Directives = append(rb.Directives, dialogDirective)
+	rb.shouldEndSession = endSession
+	return rb
+}
 
 func (rb *responseBuilder) PlayVideo(url string, title string, subtitle string) ResponseBuilder {
 
